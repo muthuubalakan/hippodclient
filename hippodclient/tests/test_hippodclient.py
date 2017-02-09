@@ -2,8 +2,8 @@ from unittest import TestCase
 
 import hippodclient
 
-class TestJoke(TestCase):
+class TestHippodClient(TestCase):
 
-    def test_is_string(self):
-        s = hippodclient.Test()
-        self.assertTrue(isinstance(s, hippodclient.Test()))
+    def test_is_initiable(self):
+        hippodclient.Test()
+        hippodclient.Core()

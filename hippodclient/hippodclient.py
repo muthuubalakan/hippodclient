@@ -8,8 +8,6 @@ import os
 import sys
 import time
 import mimetypes
-import ConfigParser
-import StringIO
 import getpass
 
 try:
