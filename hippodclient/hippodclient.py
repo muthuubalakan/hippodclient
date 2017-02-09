@@ -31,7 +31,9 @@ PASSED = "passed"
 FAILED = "failed"
 NONAPPLICABLE = "nonapplicable"
 
+DEFAULT_RESULT = NONAPPLICABLE
 DEFAULT_USERNAME = "anomymous"
+
 
 
 class Core(object):
@@ -81,12 +83,16 @@ class Test(object):
         def __init__(self):
             self.references = None
             self.tags = list()
+            self.references = list()
             self.responsible = DEFAULT_USERNAME
+
+        def responsible_set(self, name):
+            self.responsible = name
         
-        def tags_set(self, tags):
-            if type(tags) is not list:
-                raise ArgumentException("data must be an array, not {}".format(type(tags)))
-            self.tags = tags
+        def tags_set(self, *tags):
+            self.tags = list()
+            for tag in tags:
+                self.tags.append(tag)
             self._tags_cleanup()
 
         def tags_add(self, *tags):
@@ -98,26 +104,116 @@ class Test(object):
             # remove duplicate tags in list
             seen = set()
             self.tags = [x for x in self.tags if x not in seen and not seen.add(x)]
+        
+        def references_set(self, references):
+            if type(references) is not list:
+                raise ArgumentException("references must be an array, not {}".format(type(references)))
+            self.references = references
+            self._references_cleanup()
+
+        def references_add(self, *references):
+            for reference in references:
+                self.references.append(reference)
+            self._references_cleanup()
+
+        def _references_cleanup(self):
+            # remove duplicate references in list
+            seen = set()
+            self.references = [x for x in self.references if x not in seen and not seen.add(x)]
 
 
 
     class Achievement(object):
-        def __setattr__(self, name, value):
-            object.__setattr__(self, name, value)
+
+        def __init__(self):
+            self.result = DEFAULT_RESULT
+            self.test_date = time.strftime("%c")
+            self.data = list()
+            self.anchor = None
+
+        def result_set(self, result, date=None):
+            if date is None:
+                date = time.strftime("%c")
+            self.result = result
+            self.test_data = date
+
+        def anchor_set(self, anchor):
+            if type(anchor) is not str:
+                raise ArgumentException("anchor must be an string, not {}".format(type(anchor)))
+            self.anchor = anchor
+
+        def data_add(self):
+            pass
+
+        def construct(self):
+            root = dict()
+            root["result"] = self.result
+            root["test-date"] = self.test_date
+            root["data"] = self.data
+            return 
+
+
 
 
     def init_defaults(self):
-        self.submitter = DEFAULT_USERNAME
-        self.categories = None
+        self.submitter = getpass.getuser()
+        self.title = None
+        self.categories = list()
         self.data = list()
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug = debug
         self.init_defaults()
         self.attachment = Test.Attachment()
         self.achievement = Test.Achievement()
 
-                
+    def submitter_set(self, submitter):
+        val_type = type(submitter)
+        if val_type is not str:
+            raise ArgumentException("submitter must be an string, not {}".format(val_type))
+        self.submitter = submitter
 
+
+    def description_set(self, description, type="plain"):
+        if (type == "markdown"):
+            mime_type = "text/markdown"
+        else:
+            mime_type = "text/plain"
+
+        # iterate over data structure and if a description
+        # is alread there: remove and overwrite
+        for i in range(len(self.data)):
+            if self.data[i]["type"] == "description":
+                del self.data[i]
+                break
+        data_item = dict()
+        data_item["type"] = "description"
+        data_item["mime-type"] = mime_type
+        data_item["data"] = base64.b64encode(description)
+
+
+    def title_set(self, title):
+        self.title = title
+
+    def categories_set(self, categories):
+        if type(categories) is not list or not str:
+            raise ArgumentException("categories must be an array or string, not {}".format(type(categories)))
+        self.categories = categories
+
+
+
+    def json(self):
+        root = dict()
+        root["submitter"] = self.submitter
+        root["achievement"] = list()
+        root["achievement"].append(self.achievement)
+
+        # core data elements
+        object_item = dict()
+        object_item["data"] = self.data
+
+        root["object-item"] = object-item
+        return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
 
