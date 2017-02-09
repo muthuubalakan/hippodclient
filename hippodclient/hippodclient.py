@@ -35,6 +35,70 @@ DEFAULT_RESULT = NONAPPLICABLE
 DEFAULT_USERNAME = "anomymous"
 
 
+def create_file_entry(self, file_name, mime_type = None):
+        """ Create file entry for object-item data or achievement. """
+        # Check first if the file is available
+        if not os.path.isfile(file_name):
+            raise Exception("File '{}' is not available and "
+                            "can't be sent to the HippoD server.".format(file_name))
+
+        if not mime_type:
+            # Get mime type for file
+            mime_type, _ = mimetypes.guess_type(file_name)
+            if mime_type is None:
+                # Search for the mime type in the addition test mime types
+                mime_type = TestMimeTypes.guess_type(file_name)
+
+        # Convert file content to base64
+        with open(file_name, "rb") as f:
+            file_content = self.encode_base64_data(f.read())
+
+        # Create entry for object item data
+        file_entry = {"name" :      os.path.basename(file_name),
+                      "mime-type" : mime_type,
+                      "data" :      str(file_content)
+                     }
+        return file_entry
+
+def create_snippet_entry(self, file_name, type_, name):
+        if not os.path.isfile(file_name):
+            raise Exception("Snippet file '{}' is not available and "
+                            "can't be sent to the HippoD server.".format(file_name))
+        if type_ != "x-snippet-python3-mathplot-png":
+            raise Exception("Snippet only support for x-snippet-python3-mathplot-png"
+                            " - for now. Not: {}".format(type_))
+
+        # Convert file content to base64
+        with open(file_name, "rb") as f:
+            file_content = self.encode_base64_data(f.read())
+
+        # Create entry for object item data
+        file_entry = {
+                      "mime-type" : type_,
+                      "data" :      str(file_content)
+                     }
+        if name:
+            file_entry["name"] = name
+        return file_entry
+
+
+class TestMimeTypes():
+
+    # Additional mime types which are not available
+    # in the standard mime types python libary
+    types_map = {
+                 '.pcap' : 'application/vnd.tcpdump.pcap',
+                }
+
+    @staticmethod
+    def guess_type(file_name):
+        _ , ext = os.path.splitext(os.path.basename(file_name))
+
+        if ext in TestMimeTypes.types_map:
+            return TestMimeTypes.types_map[ext]
+        else:
+            return "binary/octet-stream"
+
 
 class Core(object):
 
