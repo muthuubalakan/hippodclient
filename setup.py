@@ -8,4 +8,7 @@ setup(name='hippodclient',
       author_email='hagen@jauu.net',
       license='MIT',
       packages=['hippodclient'],
-      zip_safe=False)
+      test_suite='nose.collector',
+      tests_require=['nose'],
+      zip_safe=False
+     )
