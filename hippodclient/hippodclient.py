@@ -96,7 +96,7 @@ class Container(object):
 
     # Supported HTTP methods
     HTTP_GET  = "GET"
-    HTTP_POST = "POST" 
+    HTTP_POST = "POST"
 
     # URL path
     URL_API_OBJECTS = "api/v1/object"
@@ -125,9 +125,14 @@ class Container(object):
         seperator = "/"
         if self.url.endswith("/"): seperator = ""
         full_url = "{}{}{}".format(self.url, seperator, "api/v1/object")
-        print(full_url)
-        request = urllib_request.Request(full_url, data, self.user_agent_headers)
-        urllib_request.urlopen(request, timeout=self.timeout)
+        data = str.encode(data)
+        req = urllib_request.Request(full_url, data, self.user_agent_headers)
+        try:
+            urllib_request.urlopen(req, timeout=self.timeout)
+        except urllib_request.HTTPError as e:
+            sys.stderr.write(str(e.read()))
+            return (False, e.read())
+        return (True, None)
 
     def _disable_proxy(self):
         # install no proxy, for proxied environments the
@@ -141,9 +146,12 @@ class Container(object):
     def sync(self):
         self._disable_proxy()
         self._check_pre_sync()
+        ret_list = list()
         for test in self.tests:
             json_data = test.json()
-            self._send_data(json_data)
+            ret = self._send_data(json_data)
+            ret_list.append(ret)
+        return ret_list
 
     # just an alias for sync
     upload = sync
@@ -214,6 +222,9 @@ class Test(object):
             self.anchor = None
 
         def result_set(self, result, date=None):
+            if result not in (PASSED, FAILED, NONAPPLICABLE):
+                emsg = "only passed, failed and nonapplicable supported"
+                raise ArgumentException(emsg)
             if date is None:
                 date = datetime.datetime.now().isoformat('T')
             self.result = result
@@ -232,7 +243,8 @@ class Test(object):
             root = dict()
             root["result"] = self.result
             root["test-date"] = self.test_date
-            root["data"] = self.data
+            if len(self.data) > 0:
+                root["data"] = self.data
             if self.anchor:
                 root["anchor"] = self.anchor
             return root
@@ -290,6 +302,7 @@ class Test(object):
         if c_type not in (list, str):
             emsg = "categories must be an array or str, not {}".format(c_type)
             raise ArgumentException(emsg)
+        if c_type == str: categories = [categories]
         self.categories = categories
 
     def transform(self):
@@ -302,6 +315,7 @@ class Test(object):
             emsg = "categories missing, need at least one level of category"
             raise TransformException(emsg)
         d["categories"] = self.categories
+        d["version"] = 0
         return d
 
     def json(self):
@@ -317,7 +331,7 @@ class Test(object):
         object_item["data"] = self.data
 
         root["object-item"] = self.transform()
-        pprint.pprint(root)
+        #pprint.pprint(root)
         return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
