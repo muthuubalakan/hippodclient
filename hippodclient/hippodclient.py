@@ -6,7 +6,7 @@ import base64
 import re
 import os
 import sys
-import time
+import datetime
 import mimetypes
 import getpass
 
@@ -24,6 +24,7 @@ REQUEST_TIMEOUT = 3
 class ArgumentException(Exception): pass
 class ConfigurationException(Exception): pass
 class InternalException(Exception): pass
+class TransformException(Exception): pass
 
 PASSED = "passed"
 FAILED = "failed"
@@ -91,7 +92,7 @@ class TestMimeTypes():
             return "binary/octet-stream"
 
 
-class Core(object):
+class Container(object):
 
     # Supported HTTP methods
     HTTP_GET  = "GET"
@@ -99,13 +100,12 @@ class Core(object):
 
     # URL path
     URL_API_OBJECTS = "api/v1/object"
-    URL_API_USERS   = "api/v1/users"
 
-    def __init__(self):
-        self.init_defaults()
+    def __init__(self, timeout=REQUEST_TIMEOUT):
+        self._init_defaults()
+        self.timeout = timeout
 
-
-    def init_defaults(self):
+    def _init_defaults(self):
         self.tests = list()
         self.url = None
 
@@ -115,18 +115,25 @@ class Core(object):
     def add(self, test):
         self.tests.append(test)
 
-    def check_pre_sync(self):
+    def _check_pre_sync(self):
         if not self.url:
             raise ConfigurationException("no hippod server URL specified")
 
-    def sync(self):
-        self.check_pre_sync()
+    def _send_data(self, data):
         self.user_agent_headers = {'Content-type': 'application/json', 
                                    'Accept': 'application/json' }
-        data = None
         full_url = "{}/{}".format(self.url, "api/v1/object")
         request = urllib_request.Request(full_url, data, self.user_agent_headers)
-        urllib_request.urlopen(request, timeout=REQUEST_TIMEOUT)
+        urllib_request.urlopen(request, timeout=self.timeout)
+
+    def sync(self):
+        self._check_pre_sync()
+        for test in self.tests:
+            json_data = test.json()
+            self._send_data(json_data)
+
+    # just an alias for sync
+    upload = sync
 
 
 
@@ -135,7 +142,6 @@ class Test(object):
     class Attachment(object):
 
         def __init__(self):
-            self.references = None
             self.tags = list()
             self.references = list()
             self.responsible = DEFAULT_USERNAME
@@ -175,19 +181,28 @@ class Test(object):
             seen = set()
             self.references = [x for x in self.references if x not in seen and not seen.add(x)]
 
+        def transform(self):
+            d = dict()
+            if len(self.tags) > 0:
+                d["tags"] = self.tags
+            if len(self.references) > 0:
+                d["references"] = self.references
+            d["responsible"] = self.responsible
+            return d
+
 
 
     class Achievement(object):
 
         def __init__(self):
             self.result = DEFAULT_RESULT
-            self.test_date = time.strftime("%c")
+            self.test_date = datetime.datetime.now().isoformat('T')
             self.data = list()
             self.anchor = None
 
         def result_set(self, result, date=None):
             if date is None:
-                date = time.strftime("%c")
+                date = datetime.datetime.now().isoformat('T')
             self.result = result
             self.test_data = date
 
@@ -200,12 +215,14 @@ class Test(object):
             entry = create_file_entry(filepath, mime_type)
             self.data.append(entry)
 
-        def construct(self):
+        def transform(self):
             root = dict()
             root["result"] = self.result
             root["test-date"] = self.test_date
             root["data"] = self.data
             return 
+
+
 
 
 
@@ -259,23 +276,37 @@ class Test(object):
             raise ArgumentException(emsg)
         self.categories = categories
 
+    def transform(self):
+        d = dict()
+        if not self.title:
+            emsg = "test case inpure, title missing"
+            raise TransformException(emsg)
+        d['title'] = self.title
+        if not self.categories or len(self.categories) == 0:
+            emsg = "categories missing, need at least one level of category"
+            raise TransformException(emsg)
+        d["categories"] = self.categories
+        return d
+
     def json(self):
         root = dict()
         root["submitter"] = self.submitter
         root["achievement"] = list()
-        root["achievement"].append(self.achievement)
+        root["achievement"].append(self.achievement.transform())
+
+        root["attachment"] = self.attachment.transform()
 
         # core data elements
         object_item = dict()
         object_item["data"] = self.data
 
-        root["object-item"] = object-item
+        root["object-item"] = self.transform()
         return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
 
 def test_run():        
-    c = Core()
+    c = Container()
     c.set_url("http://lx-02-06")
 
     t = Test()
