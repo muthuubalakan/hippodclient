@@ -14,11 +14,20 @@ class TestHippodClient(TestCase):
 
         t = hippodclient.Test()
         t.title_set("random title")
-        t.categories_set("team:cp")
+        t.categories_set("team:bar")
         t.attachment.tags_add("foo", "bar")
         t.achievement.result = "passed"
 
         c.add(t)
-        r = c.sync()
-        print(r)
+        c.sync()
 
+    def test_minimal(self):
+        c = hippodclient.Container(url="http://127.0.0.1/")
+
+        t = hippodclient.Test()
+        t.title_set("random title for minimal example")
+        t.categories_set("team:foo")
+        t.achievement.result = "passed"
+
+        c.add(t)
+        c.upload()
