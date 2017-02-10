@@ -120,13 +120,14 @@ class Container(object):
             raise ConfigurationException("no hippod server URL specified")
 
     def _send_data(self, data):
-        self.user_agent_headers = {'Content-type': 'application/json', 
+        self.user_agent_headers = {'Content-type': 'application/json',
                                    'Accept': 'application/json' }
         full_url = "{}/{}".format(self.url, "api/v1/object")
         request = urllib_request.Request(full_url, data, self.user_agent_headers)
         urllib_request.urlopen(request, timeout=self.timeout)
 
     def sync(self):
+        print("upload")
         self._check_pre_sync()
         for test in self.tests:
             json_data = test.json()
@@ -148,7 +149,7 @@ class Test(object):
 
         def responsible_set(self, name):
             self.responsible = name
-        
+
         def tags_set(self, *tags):
             self.tags = list()
             for tag in tags:
@@ -164,7 +165,7 @@ class Test(object):
             # remove duplicate tags in list
             seen = set()
             self.tags = [x for x in self.tags if x not in seen and not seen.add(x)]
-        
+
         def references_set(self, references):
             if type(references) is not list:
                 raise ArgumentException("references must be an array, not {}".format(type(references)))
@@ -222,7 +223,7 @@ class Test(object):
             root["data"] = self.data
             if self.anchor:
                 root["anchor"] = self.anchor
-            return 
+            return root
 
 
 
@@ -273,8 +274,9 @@ class Test(object):
         self.data.append(entry)
 
     def categories_set(self, categories):
-        if type(categories) is not list or not str:
-            emsg = "categories must be an array or string, not {}".format(type(categories))
+        c_type = type(categories)
+        if c_type not in (list, str):
+            emsg = "categories must be an array or str, not {}".format(c_type)
             raise ArgumentException(emsg)
         self.categories = categories
 
@@ -306,25 +308,6 @@ class Test(object):
         return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
-
-def test_run():        
-    c = Container()
-    c.set_url("http://lx-02-06")
-
-    t = Test()
-    t.attachment.responsible = ""
-    t.attachment.tags_add("foo")
-    t.attachment.tags_add("foo", "bar")
-    t.attachment._tags_cleanup()
-
-    t.achievement.result = ""
-    c.add(t)
-
-    c.sync()
-
-
 if __name__ == "__main__":
     sys.stderr.write("Python client library to interact with HippoD\n")
     sys.stderr.write("Please import this file and use provided function\n")
-    sys.stderr.write("Execute Test Suite Now\n\n")
-    test_run()
