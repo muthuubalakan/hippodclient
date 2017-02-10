@@ -220,6 +220,8 @@ class Test(object):
             root["result"] = self.result
             root["test-date"] = self.test_date
             root["data"] = self.data
+            if self.anchor:
+                root["anchor"] = self.anchor
             return 
 
 
