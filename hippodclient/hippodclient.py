@@ -33,60 +33,53 @@ DEFAULT_RESULT = NONAPPLICABLE
 DEFAULT_USERNAME = "anomymous"
 
 
-def create_file_entry(self, file_name, mime_type = None):
+def create_file_entry(self, file_name, mime_type):
         """ Create file entry for object-item data or achievement. """
         # Check first if the file is available
         if not os.path.isfile(file_name):
-            raise Exception("File '{}' is not available and "
-                            "can't be sent to the HippoD server.".format(file_name))
+            emsg = "File '{}' is not available".format(file_name)
+            raise ArgumentException(emsg)
 
         if not mime_type:
-            # Get mime type for file
             mime_type, _ = mimetypes.guess_type(file_name)
             if mime_type is None:
-                # Search for the mime type in the addition test mime types
                 mime_type = TestMimeTypes.guess_type(file_name)
 
-        # Convert file content to base64
         with open(file_name, "rb") as f:
-            file_content = self.encode_base64_data(f.read())
+            file_content = base64.b64encode(f.read())
 
         # Create entry for object item data
-        file_entry = {"name" :      os.path.basename(file_name),
-                      "mime-type" : mime_type,
-                      "data" :      str(file_content)
-                     }
-        return file_entry
+        entry = dict()
+        entry["name"] = os.path.basename(file_name)
+        entry["mime-type"] = mime_type
+        entry["data"] = str(file_content)
+        return entry
 
 def create_snippet_entry(self, file_name, type_, name):
         if not os.path.isfile(file_name):
-            raise Exception("Snippet file '{}' is not available and "
-                            "can't be sent to the HippoD server.".format(file_name))
+            emsg = "File '{}' is not available".format(file_name)
+            raise ArgumentException(emsg)
         if type_ != "x-snippet-python3-mathplot-png":
-            raise Exception("Snippet only support for x-snippet-python3-mathplot-png"
-                            " - for now. Not: {}".format(type_))
+            emsg = "Snippet only support for x-snippet-python3-mathplot-png" \
+                   " - for now. Not: {}".format(type_)
+            raise ArgumentException(emsg)
 
-        # Convert file content to base64
         with open(file_name, "rb") as f:
-            file_content = self.encode_base64_data(f.read())
+            file_content = base64.b64encode(f.read())
 
-        # Create entry for object item data
-        file_entry = {
-                      "mime-type" : type_,
-                      "data" :      str(file_content)
-                     }
+        entry = dict()
+        entry["mime-type"] = mime_type
+        entry["data"] = str(file_content)
         if name:
-            file_entry["name"] = name
-        return file_entry
+            entry["name"] = name
+
+        return entry
 
 
 class TestMimeTypes():
+    types_map = dict()
+    types_map[".pcap"] = 'application/vnd.tcpdump.pcap'
 
-    # Additional mime types which are not available
-    # in the standard mime types python libary
-    types_map = {
-                 '.pcap' : 'application/vnd.tcpdump.pcap',
-                }
 
     @staticmethod
     def guess_type(file_name):
@@ -130,7 +123,6 @@ class Core(object):
         self.check_pre_sync()
         self.user_agent_headers = {'Content-type': 'application/json', 
                                    'Accept': 'application/json' }
-
         data = None
         full_url = "{}/{}".format(self.url, "api/v1/object")
         request = urllib_request.Request(full_url, data, self.user_agent_headers)
@@ -204,8 +196,9 @@ class Test(object):
                 raise ArgumentException("anchor must be an string, not {}".format(type(anchor)))
             self.anchor = anchor
 
-        def data_add(self):
-            pass
+        def data_file_add(self, filepath, mime_type=None):
+            entry = create_file_entry(filepath, mime_type)
+            self.data.append(entry)
 
         def construct(self):
             root = dict()
@@ -235,7 +228,6 @@ class Test(object):
             raise ArgumentException("submitter must be an string, not {}".format(val_type))
         self.submitter = submitter
 
-
     def description_set(self, description, type="plain"):
         if (type == "markdown"):
             mime_type = "text/markdown"
@@ -252,17 +244,20 @@ class Test(object):
         data_item["type"] = "description"
         data_item["mime-type"] = mime_type
         data_item["data"] = base64.b64encode(description)
-
+        self.data.append(data_item)
 
     def title_set(self, title):
         self.title = title
 
+    def data_file_add(self, filepath, mime_type=None):
+        entry = create_file_entry(filepath, mime_type)
+        self.data.append(entry)
+
     def categories_set(self, categories):
         if type(categories) is not list or not str:
-            raise ArgumentException("categories must be an array or string, not {}".format(type(categories)))
+            emsg = "categories must be an array or string, not {}".format(type(categories))
+            raise ArgumentException(emsg)
         self.categories = categories
-
-
 
     def json(self):
         root = dict()
