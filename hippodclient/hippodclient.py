@@ -122,12 +122,24 @@ class Container(object):
     def _send_data(self, data):
         self.user_agent_headers = {'Content-type': 'application/json',
                                    'Accept': 'application/json' }
-        full_url = "{}/{}".format(self.url, "api/v1/object")
+        seperator = "/"
+        if self.url.endswith("/"): seperator = ""
+        full_url = "{}{}{}".format(self.url, seperator, "api/v1/object")
+        print(full_url)
         request = urllib_request.Request(full_url, data, self.user_agent_headers)
         urllib_request.urlopen(request, timeout=self.timeout)
 
+    def _disable_proxy(self):
+        # install no proxy, for proxied environments the
+        # system proxy is ignore here, for localhost communication
+        # this is fine, if you want to communicate via a proxy please
+        # remove the following lines
+        proxy_support = urllib_request.ProxyHandler({})
+        opener = urllib_request.build_opener(proxy_support)
+        urllib_request.install_opener(opener)
+
     def sync(self):
-        print("upload")
+        self._disable_proxy()
         self._check_pre_sync()
         for test in self.tests:
             json_data = test.json()
@@ -295,16 +307,17 @@ class Test(object):
     def json(self):
         root = dict()
         root["submitter"] = self.submitter
-        root["achievement"] = list()
-        root["achievement"].append(self.achievement.transform())
+        root["achievements"] = list()
+        root["achievements"].append(self.achievement.transform())
 
-        root["attachment"] = self.attachment.transform()
+        root["attachments"] = self.attachment.transform()
 
         # core data elements
         object_item = dict()
         object_item["data"] = self.data
 
         root["object-item"] = self.transform()
+        pprint.pprint(root)
         return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
