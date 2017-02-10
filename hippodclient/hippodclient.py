@@ -101,13 +101,13 @@ class Container(object):
     # URL path
     URL_API_OBJECTS = "api/v1/object"
 
-    def __init__(self, timeout=REQUEST_TIMEOUT):
+    def __init__(self, url=None, timeout=REQUEST_TIMEOUT):
         self._init_defaults()
         self.timeout = timeout
+        self.url = url
 
     def _init_defaults(self):
         self.tests = list()
-        self.url = None
 
     def set_url(self, url):
         self.url = url
