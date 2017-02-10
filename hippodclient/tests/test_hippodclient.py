@@ -21,13 +21,35 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.sync()
 
-    def test_minimal(self):
+    def test_minimal_passed(self):
         c = hippodclient.Container(url="http://127.0.0.1/")
 
         t = hippodclient.Test()
-        t.title_set("random title for minimal example")
+        t.title_set("random title for minimal example, passed")
         t.categories_set("team:foo")
         t.achievement.result = "passed"
+
+        c.add(t)
+        c.upload()
+
+    def test_minimal_failed(self):
+        c = hippodclient.Container(url="http://127.0.0.1/")
+
+        t = hippodclient.Test()
+        t.title_set("random title for minimal example, failed")
+        t.categories_set("team:foo")
+        t.achievement.result = "failed"
+
+        c.add(t)
+        c.upload()
+
+    def test_minimal_nonapplicable(self):
+        c = hippodclient.Container(url="http://127.0.0.1/")
+
+        t = hippodclient.Test()
+        t.title_set("random title for minimal example, nonapplicable")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
 
         c.add(t)
         c.upload()
