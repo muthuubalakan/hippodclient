@@ -9,6 +9,7 @@ import sys
 import datetime
 import mimetypes
 import getpass
+import textwrap
 
 try:
     # python3
@@ -239,6 +240,10 @@ class Test(object):
             entry = create_file_entry(filepath, mime_type)
             self.data.append(entry)
 
+        def snippet_file_add(self, filepath, type):
+            entry = create_snippet_entry(filepath, type)
+            self.data.append(entry)
+
         def transform(self):
             root = dict()
             root["result"] = self.result
@@ -272,11 +277,14 @@ class Test(object):
             raise ArgumentException("submitter must be an string, not {}".format(val_type))
         self.submitter = submitter
 
-    def description_set(self, description, type="plain"):
+    def description_set(self, description, type="plain", detent=False):
         if (type == "markdown"):
             mime_type = "text/markdown"
         else:
             mime_type = "text/plain"
+
+        if detent == True:
+            description = textwrap.dedent(description)
 
         # iterate over data structure and if a description
         # is alread there: remove and overwrite
@@ -291,7 +299,7 @@ class Test(object):
         self.data.append(data_item)
 
     def description_markdown_set(self, description):
-        self.description_set(description, type="markdown")
+        self.description_set(description, type="markdown", detent=True)
 
     def description_plain_set(self, description):
         self.description_set(description)
@@ -301,6 +309,10 @@ class Test(object):
 
     def data_file_add(self, filepath, mime_type=None):
         entry = create_file_entry(filepath, mime_type)
+        self.data.append(entry)
+
+    def snippet_file_add(self, filepath, type):
+        entry = create_snippet_entry(filepath, type)
         self.data.append(entry)
 
     def categories_set(self, categories):
