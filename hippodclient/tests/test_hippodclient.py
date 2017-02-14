@@ -53,3 +53,22 @@ class TestHippodClient(TestCase):
 
         c.add(t)
         c.upload()
+
+    def test_minimal_nonapplicable(self):
+        c = hippodclient.Container(url="http://127.0.0.1/")
+        t = hippodclient.Test()
+        t.title_set("markdown test")
+        description = """
+        # This is a first level heading
+
+        ## Second Level Heading
+
+        ### Third level heading
+
+        """
+        t.description_markdown_set(description)
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+
+        c.add(t)
+        c.upload()
