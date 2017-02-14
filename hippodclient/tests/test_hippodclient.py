@@ -13,6 +13,7 @@ class TestHippodClient(TestCase):
         c.set_url("http://127.0.0.1/")
 
         t = hippodclient.Test()
+        t.submitter_set("anonymous")
         t.title_set("random title")
         t.categories_set("team:bar")
         t.attachment.tags_add("foo", "bar")
@@ -25,6 +26,7 @@ class TestHippodClient(TestCase):
         c = hippodclient.Container(url="http://127.0.0.1/")
 
         t = hippodclient.Test()
+        t.submitter_set("anonymous")
         t.title_set("random title for minimal example, passed")
         t.categories_set("team:foo")
         t.achievement.result = "passed"
@@ -36,6 +38,7 @@ class TestHippodClient(TestCase):
         c = hippodclient.Container(url="http://127.0.0.1/")
 
         t = hippodclient.Test()
+        t.submitter_set("anonymous")
         t.title_set("random title for minimal example, failed")
         t.categories_set("team:foo")
         t.achievement.result = "failed"
@@ -47,6 +50,7 @@ class TestHippodClient(TestCase):
         c = hippodclient.Container(url="http://127.0.0.1/")
 
         t = hippodclient.Test()
+        t.submitter_set("anonymous")
         t.title_set("random title for minimal example, nonapplicable")
         t.categories_set("team:foo")
         t.achievement.result = "nonapplicable"
@@ -57,6 +61,7 @@ class TestHippodClient(TestCase):
     def test_minimal_nonapplicable(self):
         c = hippodclient.Container(url="http://127.0.0.1/")
         t = hippodclient.Test()
+        t.submitter_set("anonymous")
         t.title_set("markdown test")
         description = """
         # This is a first level heading

@@ -295,7 +295,7 @@ class Test(object):
         data_item = dict()
         data_item["type"] = "description"
         data_item["mime-type"] = mime_type
-        data_item["data"] = base64.b64encode(description)
+        data_item["data"] = base64.b64encode(description.encode())
         self.data.append(data_item)
 
     def description_markdown_set(self, description):
