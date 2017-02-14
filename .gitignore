@@ -1,3 +1,6 @@
+*.swp
+*.orig
+
 # Compiled python modules.
 *.pyc
 
