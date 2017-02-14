@@ -290,6 +290,12 @@ class Test(object):
         data_item["data"] = base64.b64encode(description)
         self.data.append(data_item)
 
+    def description_markdown_set(self, description):
+        self.description_set(description, type="markdown")
+
+    def description_plain_set(self, description):
+        self.description_set(description)
+
     def title_set(self, title):
         self.title = title
 
