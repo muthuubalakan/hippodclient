@@ -18,7 +18,7 @@ except ImportError:
     # python2
     import urllib2 as urllib_request
 
-REQUEST_TIMEOUT = 3
+REQUEST_TIMEOUT = 5
 
 
 # custom exceptions

@@ -21,6 +21,13 @@ sudo apt-get install python3-setuptools
 
 # Testing
 
+## Python Test Dependencies
+
+```
+sudo aptitude install python-tk
+```
+
+
 Python2 Environment
 
 ```
