@@ -13,3 +13,6 @@ test3:
 	python3 setup.py test
 
 test: test2 test3
+
+upload:
+	python setup.py sdist upload -r pypi
