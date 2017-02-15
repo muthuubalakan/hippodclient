@@ -54,7 +54,7 @@ def create_file_entry(file_name, mime_type):
         entry = dict()
         entry["name"] = os.path.basename(file_name)
         entry["mime-type"] = mime_type
-        entry["data"] = str(file_content)
+        entry["data"] = file_content.decode()
         return entry
 
 def create_snippet_entry(file_name, mime_type, name):
@@ -71,7 +71,7 @@ def create_snippet_entry(file_name, mime_type, name):
 
         entry = dict()
         entry["mime-type"] = mime_type
-        entry["data"] = str(file_content)
+        entry["data"] = file_content.decode()
         if name:
             entry["name"] = name
 
@@ -295,7 +295,7 @@ class Test(object):
         data_item = dict()
         data_item["type"] = "description"
         data_item["mime-type"] = mime_type
-        data_item["data"] = base64.b64encode(description.encode())
+        data_item["data"] = (base64.b64encode(description.encode())).decode()
         self.data.append(data_item)
 
     def description_markdown_set(self, description):
