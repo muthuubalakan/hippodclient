@@ -35,7 +35,7 @@ DEFAULT_RESULT = NONAPPLICABLE
 DEFAULT_USERNAME = "anomymous"
 
 
-def create_file_entry(self, file_name, mime_type):
+def create_file_entry(file_name, mime_type):
         """ Create file entry for object-item data or achievement. """
         # Check first if the file is available
         if not os.path.isfile(file_name):
@@ -57,13 +57,13 @@ def create_file_entry(self, file_name, mime_type):
         entry["data"] = str(file_content)
         return entry
 
-def create_snippet_entry(self, file_name, type_, name):
+def create_snippet_entry(file_name, mime_type, name):
         if not os.path.isfile(file_name):
             emsg = "File '{}' is not available".format(file_name)
             raise ArgumentException(emsg)
-        if type_ != "x-snippet-python3-mathplot-png":
-            emsg = "Snippet only support for x-snippet-python3-mathplot-png" \
-                   " - for now. Not: {}".format(type_)
+        if mime_type != "x-snippet-python3-matplot-png":
+            emsg = "Snippet only support for x-snippet-python3-matplot-png" \
+                   " - for now. Not: {}".format(mime_type)
             raise ArgumentException(emsg)
 
         with open(file_name, "rb") as f:
@@ -240,8 +240,8 @@ class Test(object):
             entry = create_file_entry(filepath, mime_type)
             self.data.append(entry)
 
-        def snippet_file_add(self, filepath, type):
-            entry = create_snippet_entry(filepath, type)
+        def snippet_file_add(self, filepath, type, name=None):
+            entry = create_snippet_entry(filepath, type, name)
             self.data.append(entry)
 
         def transform(self):
@@ -311,8 +311,8 @@ class Test(object):
         entry = create_file_entry(filepath, mime_type)
         self.data.append(entry)
 
-    def snippet_file_add(self, filepath, type):
-        entry = create_snippet_entry(filepath, type)
+    def snippet_file_add(self, filepath, type, name=None):
+        entry = create_snippet_entry(filepath, type, name)
         self.data.append(entry)
 
     def categories_set(self, categories):
@@ -334,6 +334,8 @@ class Test(object):
             raise TransformException(emsg)
         d["categories"] = self.categories
         d["version"] = 0
+        if len(self.data) > 0:
+            d["data"] = self.data
         return d
 
     def json(self):
@@ -343,10 +345,6 @@ class Test(object):
         root["achievements"].append(self.achievement.transform())
 
         root["attachments"] = self.attachment.transform()
-
-        # core data elements
-        object_item = dict()
-        object_item["data"] = self.data
 
         root["object-item"] = self.transform()
         #pprint.pprint(root)
