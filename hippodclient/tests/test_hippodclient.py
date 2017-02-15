@@ -4,6 +4,11 @@ import shutil
 import textwrap
 
 from unittest import TestCase
+
+# for image generation
+import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
