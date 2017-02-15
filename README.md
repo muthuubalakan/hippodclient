@@ -1,3 +1,31 @@
+# Usage
+
+Simple install this module via pip (pip for Python 2 is also supported)
+
+```
+pip3 install hippodclient
+```
+
+And simple upload test with the following lines:
+
+```
+import hippodclient
+
+c = hippodclient.Container(url="http://localhost")
+
+t = hippodclient.Test()
+t.submitter_set("anonymous")
+t.title_set("random title")
+t.categories_set("team:bar")
+t.attachment.tags_add("foo", "bar")
+t.achievement.result = "passed"
+
+c.add(t)
+c.sync()
+```
+
+That's it!
+
 
 # Development
 
