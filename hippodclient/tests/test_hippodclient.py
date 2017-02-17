@@ -64,26 +64,13 @@ class TestHippodClient(TestCase):
         hippodclient.Test()
         hippodclient.Container(timeout=TIMEOUT)
 
-    def test_upload(self):
-        c = hippodclient.Container(timeout=TIMEOUT)
-        c.set_url(URL)
-
-        t = hippodclient.Test()
-        t.submitter_set("anonymous")
-        t.title_set("random title")
-        t.categories_set("team:bar")
-        t.attachment.tags_add("foo", "bar")
-        t.achievement.result = "passed"
-
-        c.add(t)
-        c.sync()
 
     def test_minimal_passed(self):
         c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
-        t.title_set("random title for minimal example, passed")
+        t.title_set("Minimal Test with Passed Result")
         t.categories_set("team:bp")
         t.achievement.result = "passed"
 
@@ -95,9 +82,21 @@ class TestHippodClient(TestCase):
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
-        t.title_set("random title for minimal example, failed")
+        t.title_set("Minimal Test with Failed Result")
         t.categories_set("team:foo")
         t.achievement.result = "failed"
+
+        c.add(t)
+        c.upload()
+
+    def test_minimal_exception(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Minimal Test with Exception Result")
+        t.categories_set("team:foo")
+        t.achievement.result = "exception"
 
         c.add(t)
         c.upload()
@@ -107,7 +106,7 @@ class TestHippodClient(TestCase):
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
-        t.title_set("random title for minimal example, nonapplicable")
+        t.title_set("Minimal Test with Non Applicable Result")
         t.categories_set("team:foo")
         t.achievement.result = "nonapplicable"
 

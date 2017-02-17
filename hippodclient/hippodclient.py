@@ -30,6 +30,7 @@ class TransformException(Exception): pass
 PASSED = "passed"
 FAILED = "failed"
 NONAPPLICABLE = "nonapplicable"
+EXCEPTION = "exception"
 
 DEFAULT_RESULT = NONAPPLICABLE
 DEFAULT_USERNAME = "anomymous"
@@ -223,7 +224,7 @@ class Test(object):
             self.anchor = None
 
         def result_set(self, result, date=None):
-            if result not in (PASSED, FAILED, NONAPPLICABLE):
+            if result not in (PASSED, FAILED, NONAPPLICABLE, EXCEPTION):
                 emsg = "only passed, failed and nonapplicable supported"
                 raise ArgumentException(emsg)
             if date is None:
