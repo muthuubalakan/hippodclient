@@ -84,7 +84,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("random title for minimal example, passed")
-        t.categories_set("team:bp")
+        t.categories_set("team:foo")
         t.achievement.result = "passed"
 
         c.add(t)
@@ -361,3 +361,35 @@ class TestHippodClient(TestCase):
 
         c.add(t)
         c.upload()
+
+
+    def test_variety(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Variety Test")
+        t.categories_set("team:foo")
+        t.achievement.result = "passed"
+        t.achievement.variety_add("operating-system", "windows95")
+        t.achievement.variety_add("visual-studio-version", "2012")
+        t.achievement.variety_add("eval-board", "zynx")
+
+        c.add(t)
+        c.upload()
+
+
+    def test_version(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Version Test")
+        t.categories_set("team:foo")
+        t.achievement.result = "passed"
+        t.version_set(666)
+
+        c.add(t)
+        c.upload()
+
+
