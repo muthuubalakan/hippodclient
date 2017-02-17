@@ -187,10 +187,10 @@ class Test(object):
             seen = set()
             self.tags = [x for x in self.tags if x not in seen and not seen.add(x)]
 
-        def references_set(self, references):
-            if type(references) is not list:
-                raise ArgumentException("references must be an array, not {}".format(type(references)))
-            self.references = references
+        def references_set(self, *references):
+            self.references = []
+            for reference in references:
+                self.references.append(reference)
             self._references_cleanup()
 
         def references_add(self, *references):
@@ -315,13 +315,10 @@ class Test(object):
         entry = create_snippet_entry(filepath, type, name)
         self.data.append(entry)
 
-    def categories_set(self, categories):
-        c_type = type(categories)
-        if c_type not in (list, str):
-            emsg = "categories must be an array or str, not {}".format(c_type)
-            raise ArgumentException(emsg)
-        if c_type == str: categories = [categories]
-        self.categories = categories
+    def categories_set(self, *categories):
+        self.categories = list()
+        for category in categories:
+            self.categories.append(category)
 
     def transform(self):
         d = dict()
@@ -347,7 +344,7 @@ class Test(object):
         root["attachments"] = self.attachment.transform()
 
         root["object-item"] = self.transform()
-        #pprint.pprint(root)
+        pprint.pprint(root)
         return json.dumps(root, sort_keys=True, separators=(',', ': '))
 
 
