@@ -245,7 +245,7 @@ class Test(object):
             entry = create_snippet_entry(filepath, type, name)
             self.data.append(entry)
 
-        def variety_add(self, key, value):
+        def variety_set(self, key, value):
             self.variety[key] = value
 
         def transform(self):
@@ -269,6 +269,7 @@ class Test(object):
         self.submitter = getpass.getuser()
         self.title = None
         self.categories = list()
+        self.version = 0
         self.data = list()
 
     def __init__(self, debug=False):
@@ -326,6 +327,9 @@ class Test(object):
         for category in categories:
             self.categories.append(category)
 
+    def version_set(self, version):
+        self.version = version
+
     def transform(self):
         d = dict()
         if not self.title:
@@ -336,7 +340,7 @@ class Test(object):
             emsg = "categories missing, need at least one level of category"
             raise TransformException(emsg)
         d["categories"] = self.categories
-        d["version"] = 0
+        d["version"] = self.version
         if len(self.data) > 0:
             d["data"] = self.data
         return d
