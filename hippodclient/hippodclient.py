@@ -245,7 +245,7 @@ class Test(object):
             entry = create_snippet_entry(filepath, type, name)
             self.data.append(entry)
 
-        def variety_set(self, key, value):
+        def variety_add(self, key, value):
             self.variety[key] = value
 
         def transform(self):
