@@ -5,7 +5,6 @@ import textwrap
 
 from unittest import TestCase
 
-
 import hippodclient
 
 
@@ -16,13 +15,22 @@ TIMEOUT = 10
 
 def gen_rand_image_path():
     tmpdir = tempfile.mkdtemp()
-    tmpfile = os.path.join(tmpdir, "graph.png")
 
     cwd = os.path.dirname(os.path.abspath(__file__))
     img_path = os.path.join(cwd, "graph.png")
     if not os.path.isfile(img_path):
         return None
     return img_path
+
+def file_log_path():
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    img_path = os.path.join(cwd, "hippod.log")
+    if not os.path.isfile(img_path):
+        return None
+    return img_path
+
+def file_py_path():
+    return os.path.abspath(__file__)
 
 def gen_snippet_file(offset):
     tmpdir = tempfile.mkdtemp()
@@ -76,7 +84,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("random title for minimal example, passed")
-        t.categories_set("team:foo")
+        t.categories_set("team:bp")
         t.achievement.result = "passed"
 
         c.add(t)
@@ -102,6 +110,20 @@ class TestHippodClient(TestCase):
         t.title_set("random title for minimal example, nonapplicable")
         t.categories_set("team:foo")
         t.achievement.result = "nonapplicable"
+
+        c.add(t)
+        c.upload()
+
+    def test_minimal_tags_category(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Minimal Test with Categories and Tags")
+        t.categories_set("team:foo", "bar", "foo", "trump")
+        t.attachment.tags_set("bar", "foo", "trump", "obama", "merkel", "holande")
+        t.attachment.references_set("ref:1", "ref:2", "ref:3", "ref:4")
+        t.achievement.result = "passed"
 
         c.add(t)
         c.upload()
@@ -169,7 +191,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Achievement")
-        t.description_plain_set("Simple Description")
+        t.description_plain_set("simple description")
         t.categories_set("team:foo")
         t.achievement.result = "nonapplicable"
 
@@ -217,9 +239,10 @@ class TestHippodClient(TestCase):
 
     def test_different_achievements(self):
         c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
         t = hippodclient.Test()
         t.submitter_set("anonymous")
-        t.title_set("Different Achievements")
+        t.title_set("Different Tests")
         t.categories_set("team:foo")
         t.achievement.result = "passed"
         c.add(t)
@@ -238,4 +261,103 @@ class TestHippodClient(TestCase):
         t.achievement.result = "nonapplicable"
         c.add(t)
 
+        c.upload()
+
+    def test_image_item(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Image Item")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+        image = gen_rand_image_path()
+        self.assertTrue(image)
+        t.data_file_add(image)
+        c.add(t)
+        c.upload()
+
+    def test_image_achievement(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Image Achievement")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+        image = gen_rand_image_path()
+        self.assertTrue(image)
+        t.achievement.data_file_add(image)
+        c.add(t)
+        c.upload()
+
+    def test_multiple_data_achievement(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Multiple Data Achievements")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+        path = gen_rand_image_path()
+        self.assertTrue(path)
+        t.achievement.data_file_add(path)
+        path = file_py_path()
+        self.assertTrue(path)
+        t.achievement.data_file_add(path)
+        c.add(t)
+        c.upload()
+
+    def test_multiple_data_items(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Multiple Data Items")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+        # add image
+        path = gen_rand_image_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        # add python file
+        path = file_py_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        # add log file
+        path = file_log_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        c.add(t)
+        c.upload()
+
+    def test_multiple_data_items_achievements(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Multiple Data Items and Achievements")
+        t.categories_set("team:foo")
+        t.achievement.result = "nonapplicable"
+        # add image
+        path = gen_rand_image_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        # add python file
+        path = file_py_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        # add log file
+        path = file_log_path()
+        self.assertTrue(path)
+        t.data_file_add(path)
+        # add image
+        path = gen_rand_image_path()
+        self.assertTrue(path)
+        t.achievement.data_file_add(path)
+        # add python file
+        path = file_py_path()
+        self.assertTrue(path)
+        t.achievement.data_file_add(path)
+        # add log file
+        path = file_log_path()
+        self.assertTrue(path)
+        t.achievement.data_file_add(path)
+
+        c.add(t)
         c.upload()
