@@ -2,6 +2,8 @@ import os
 import tempfile
 import shutil
 import textwrap
+import string
+import random
 
 from unittest import TestCase
 
@@ -360,3 +362,17 @@ class TestHippodClient(TestCase):
 
         c.add(t)
         c.upload()
+
+    def mass(self):
+        for i in range(5000):
+            c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+            title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
+
+            t = hippodclient.Test()
+            t.submitter_set("anonymous")
+            t.title_set(title)
+            t.categories_set("team:bp")
+            t.achievement.result = "passed"
+
+            c.add(t)
+            c.upload()

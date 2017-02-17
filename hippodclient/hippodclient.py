@@ -123,7 +123,9 @@ class Container(object):
 
     def _send_data(self, data):
         self.user_agent_headers = {'Content-type': 'application/json',
-                                   'Accept': 'application/json' }
+                                   'Accept': 'application/json',
+                                   'User-Agent' : 'Hippodclient/1.0+'
+                                   }
         seperator = "/"
         if self.url.endswith("/"): seperator = ""
         full_url = "{}{}{}".format(self.url, seperator, "api/v1/object")
