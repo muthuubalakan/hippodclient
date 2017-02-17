@@ -220,6 +220,7 @@ class Test(object):
             self.result = DEFAULT_RESULT
             self.test_date = datetime.datetime.now().isoformat('T')
             self.data = list()
+            self.variety = dict()
             self.anchor = None
 
         def result_set(self, result, date=None):
@@ -244,6 +245,9 @@ class Test(object):
             entry = create_snippet_entry(filepath, type, name)
             self.data.append(entry)
 
+        def variety_add(self, key, value):
+            self.variety[key] = value
+
         def transform(self):
             root = dict()
             root["result"] = self.result
@@ -252,6 +256,8 @@ class Test(object):
                 root["data"] = self.data
             if self.anchor:
                 root["anchor"] = self.anchor
+            if self.variety:
+                root["variety"] = self.variety
             return root
 
 
