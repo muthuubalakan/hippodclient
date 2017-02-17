@@ -5,35 +5,24 @@ import textwrap
 
 from unittest import TestCase
 
-# for image generation
-import matplotlib
-# Force matplotlib to not use any Xwindows backend.
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import numpy as np
-
 
 import hippodclient
 
 
 
 URL = "http://127.0.0.1/"
+TIMEOUT = 10
 
 
-def gen_rand_image():
+def gen_rand_image_path():
     tmpdir = tempfile.mkdtemp()
     tmpfile = os.path.join(tmpdir, "graph.png")
 
-    t = np.arange(0.0, 2.0, 0.01)
-    s = 1 + np.sin(2*np.pi*t)
-    plt.plot(t, s)
-
-    plt.xlabel('time (s)')
-    plt.ylabel('voltage (mV)')
-    plt.title('About as simple as it gets, folks')
-    plt.grid(True)
-    plt.savefig(tmpfile)
-    return tmpdir, tmpfile
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    img_path = os.path.join(cwd, "graph.png")
+    if not os.path.isfile(img_path):
+        return None
+    return img_path
 
 def gen_snippet_file(offset):
     tmpdir = tempfile.mkdtemp()
@@ -65,10 +54,10 @@ class TestHippodClient(TestCase):
 
     def test_is_initiable(self):
         hippodclient.Test()
-        hippodclient.Container()
+        hippodclient.Container(timeout=TIMEOUT)
 
     def test_upload(self):
-        c = hippodclient.Container()
+        c = hippodclient.Container(timeout=TIMEOUT)
         c.set_url(URL)
 
         t = hippodclient.Test()
@@ -82,7 +71,7 @@ class TestHippodClient(TestCase):
         c.sync()
 
     def test_minimal_passed(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
@@ -94,7 +83,7 @@ class TestHippodClient(TestCase):
         c.upload()
 
     def test_minimal_failed(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
@@ -106,7 +95,7 @@ class TestHippodClient(TestCase):
         c.upload()
 
     def test_minimal_nonapplicable(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
@@ -118,7 +107,7 @@ class TestHippodClient(TestCase):
         c.upload()
 
     def test_markdown_minimal(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Markdown Test")
@@ -139,7 +128,7 @@ class TestHippodClient(TestCase):
 
 
     def test_snippet_item(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Item")
@@ -154,8 +143,8 @@ class TestHippodClient(TestCase):
         c.upload()
         shutil.rmtree(tmp_dir)
 
-    def test_snippet_multiple__item(self):
-        c = hippodclient.Container(url=URL)
+    def test_snippet_multiple_item(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Item Multiple")
@@ -176,7 +165,7 @@ class TestHippodClient(TestCase):
 
 
     def test_snippet_achievement(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Achievement")
@@ -193,7 +182,7 @@ class TestHippodClient(TestCase):
 
 
     def test_snippet_multiple_achievement(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Achievement Multiple")
@@ -214,7 +203,7 @@ class TestHippodClient(TestCase):
 
 
     def test_mass_upload(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Mass Upload")
@@ -227,7 +216,7 @@ class TestHippodClient(TestCase):
 
 
     def test_different_achievements(self):
-        c = hippodclient.Container(url=URL)
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Different Achievements")
