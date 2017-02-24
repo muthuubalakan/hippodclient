@@ -344,7 +344,7 @@ class Test(object):
         root["achievements"] = list()
         root["achievements"].append(self.achievement.transform())
 
-        root["attachments"] = self.attachment.transform()
+        root["attachment"] = self.attachment.transform()
 
         root["object-item"] = self.transform()
         pprint.pprint(root)
