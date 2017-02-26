@@ -363,7 +363,27 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
-    def test_mass(self):
+    def test_category_mass(self):
+        category_first = ["team:foo", "team:bar"]
+        category_second = ["os-core", "configuratioon", "routing", "init"]
+        for i in range(30):
+            c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+            title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
+
+            t = hippodclient.Test()
+            t.submitter_set("anonymous")
+            t.title_set(title)
+            category = []
+            category.append(random.choice(category_first))
+            for i in range(random.randint(1, 4)):
+                    category.append(random.choice(category_second))
+            t.categories_set(*category)
+            t.achievement.result = "passed"
+
+            c.add(t)
+            c.upload()
+
+    def mass(self):
         for i in range(5000):
             c = hippodclient.Container(url=URL, timeout=TIMEOUT)
             title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
