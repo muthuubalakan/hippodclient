@@ -363,7 +363,7 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
-    def mass(self):
+    def test_mass(self):
         for i in range(5000):
             c = hippodclient.Container(url=URL, timeout=TIMEOUT)
             title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))

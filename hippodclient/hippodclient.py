@@ -33,7 +33,7 @@ NONAPPLICABLE = "nonapplicable"
 EXCEPTION = "exception"
 
 DEFAULT_RESULT = NONAPPLICABLE
-DEFAULT_USERNAME = "anomymous"
+DEFAULT_USERNAME = "anonymous"
 
 
 def create_file_entry(file_name, mime_type):
