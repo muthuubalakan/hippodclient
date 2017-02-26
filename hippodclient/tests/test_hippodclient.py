@@ -34,6 +34,15 @@ def file_log_path():
 def file_py_path():
     return os.path.abspath(__file__)
 
+def random_category():
+    category_first = ["team:foo", "team:bar", "team:qux"]
+    category_second = ["os-core", "configuration", "routing", "init"]
+    category = []
+    category.append(random.choice(category_first))
+    for i in range(random.randint(1, 5)):
+        category.append(random.choice(category_second))
+    return category
+
 def gen_snippet_file(offset):
     tmpdir = tempfile.mkdtemp()
     tmpfile = os.path.join(tmpdir, "snippet.py")
@@ -73,7 +82,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Minimal Test with Passed Result")
-        t.categories_set("team:bp")
+        t.categories_set(*random_category())
         t.achievement.result = "passed"
 
         c.add(t)
@@ -85,7 +94,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Minimal Test with Failed Result")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "failed"
 
         c.add(t)
@@ -97,7 +106,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Minimal Test with Exception Result")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "exception"
 
         c.add(t)
@@ -109,7 +118,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Minimal Test with Non Applicable Result")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         c.add(t)
@@ -121,7 +130,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Minimal Test with Categories and Tags")
-        t.categories_set("team:foo", "bar", "foo", "trump")
+        t.categories_set(*random_category())
         t.attachment.tags_set("bar", "foo", "trump", "obama", "merkel", "holande")
         t.attachment.references_set("ref:1", "ref:2", "ref:3", "ref:4")
         t.achievement.result = "passed"
@@ -143,7 +152,7 @@ class TestHippodClient(TestCase):
 
         """
         t.description_markdown_set(description)
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         c.add(t)
@@ -156,7 +165,7 @@ class TestHippodClient(TestCase):
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Item")
         t.description_plain_set("Simple Description")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         tmp_dir, graph_path = gen_snippet_file(1)
@@ -172,7 +181,7 @@ class TestHippodClient(TestCase):
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Item Multiple")
         t.description_plain_set("Simple Description")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         tmps = []
@@ -193,7 +202,7 @@ class TestHippodClient(TestCase):
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Achievement")
         t.description_plain_set("simple description")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         tmp_dir, graph_path = gen_snippet_file(1)
@@ -210,7 +219,7 @@ class TestHippodClient(TestCase):
         t.submitter_set("anonymous")
         t.title_set("Snippet Test Achievement Multiple")
         t.description_plain_set("Simple Description")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
 
         tmps = []
@@ -231,7 +240,7 @@ class TestHippodClient(TestCase):
         t.submitter_set("anonymous")
         t.title_set("Mass Upload")
         t.description_plain_set("Simple Description")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         c.add(t)
         for i in range(10):
@@ -244,21 +253,21 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Different Tests")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "passed"
         c.add(t)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Different Achievements")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "failed"
         c.add(t)
 
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Different Achievements")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         c.add(t)
 
@@ -269,7 +278,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Image Item")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         image = gen_rand_image_path()
         self.assertTrue(image)
@@ -282,7 +291,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Image Achievement")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         image = gen_rand_image_path()
         self.assertTrue(image)
@@ -295,7 +304,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Multiple Data Achievements")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         path = gen_rand_image_path()
         self.assertTrue(path)
@@ -311,7 +320,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Multiple Data Items")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         # add image
         path = gen_rand_image_path()
@@ -333,7 +342,7 @@ class TestHippodClient(TestCase):
         t = hippodclient.Test()
         t.submitter_set("anonymous")
         t.title_set("Multiple Data Items and Achievements")
-        t.categories_set("team:foo")
+        t.categories_set(*random_category())
         t.achievement.result = "nonapplicable"
         # add image
         path = gen_rand_image_path()
@@ -363,25 +372,6 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
-    def test_category_mass(self):
-        category_first = ["team:foo", "team:bar"]
-        category_second = ["os-core", "configuratioon", "routing", "init"]
-        for i in range(30):
-            c = hippodclient.Container(url=URL, timeout=TIMEOUT)
-            title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
-
-            t = hippodclient.Test()
-            t.submitter_set("anonymous")
-            t.title_set(title)
-            category = []
-            category.append(random.choice(category_first))
-            for i in range(random.randint(1, 4)):
-                    category.append(random.choice(category_second))
-            t.categories_set(*category)
-            t.achievement.result = "passed"
-
-            c.add(t)
-            c.upload()
 
     def mass(self):
         for i in range(5000):
@@ -391,7 +381,7 @@ class TestHippodClient(TestCase):
             t = hippodclient.Test()
             t.submitter_set("anonymous")
             t.title_set(title)
-            t.categories_set("team:bp")
+            t.categories_set(*random_category())
             t.achievement.result = "passed"
 
             c.add(t)
