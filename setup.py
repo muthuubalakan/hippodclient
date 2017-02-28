@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='hippodclient',
-      version='1.2',
+      version='1.3',
       description='Client Adapter to HippodD',
       url='http://github.com/hgn/hippod-client',
       author='Hagen Paul Pfeifer',
