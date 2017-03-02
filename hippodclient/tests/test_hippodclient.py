@@ -39,9 +39,13 @@ def random_category():
     category_second = ["os-core", "configuration", "routing", "init"]
     category = []
     category.append(random.choice(category_first))
-    for i in range(random.randint(1, 5)):
+    for i in range(random.randint(1, 3)):
         category.append(random.choice(category_second))
     return category
+
+def random_result():
+    results = ["passed", "exception", "failed", "nonapplicable" ]
+    return random.choice(results)
 
 def gen_snippet_file(offset):
     tmpdir = tempfile.mkdtemp()
@@ -373,7 +377,7 @@ class TestHippodClient(TestCase):
         c.upload()
 
 
-    def mass(self):
+    def test_mass(self):
         for i in range(5000):
             c = hippodclient.Container(url=URL, timeout=TIMEOUT)
             title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
@@ -382,7 +386,7 @@ class TestHippodClient(TestCase):
             t.submitter_set("anonymous")
             t.title_set(title)
             t.categories_set(*random_category())
-            t.achievement.result = "passed"
+            t.achievement.result = random_result()
 
             c.add(t)
             c.upload()
