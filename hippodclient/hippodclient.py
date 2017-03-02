@@ -78,6 +78,9 @@ def create_snippet_entry(file_name, mime_type, name):
 
         return entry
 
+def has_invalid_character(string):
+    return not bool(re.match("^[a-z0-9-:]*$", string))
+
 
 class TestMimeTypes():
     types_map = dict()
@@ -177,11 +180,19 @@ class Test(object):
         def tags_set(self, *tags):
             self.tags = list()
             for tag in tags:
+                if has_invalid_character(tag):
+                    emsg = "tag contain invalid char which is not allowed ([a-z0-9-:]): {}"
+                    emsg.format(tag)
+                    raise ArgumentException(emsg)
                 self.tags.append(tag)
             self._tags_cleanup()
 
         def tags_add(self, *tags):
             for tag in tags:
+                if has_invalid_character(tag):
+                    emsg = "tag contain invalid char which is not allowed ([a-z0-9-:]): {}"
+                    emsg.format(tag)
+                    raise ArgumentException(emsg)
                 self.tags.append(tag)
             self._tags_cleanup()
 
@@ -321,6 +332,10 @@ class Test(object):
     def categories_set(self, *categories):
         self.categories = list()
         for category in categories:
+            if has_invalid_character(category):
+                emsg = "category contains invalid char which is not allowed(): {}"
+                emsg.format(category)
+                raise ArgumentException(emsg)
             self.categories.append(category)
 
     def transform(self):
