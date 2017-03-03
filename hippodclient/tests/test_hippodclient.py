@@ -409,6 +409,18 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
+    def test_category_arg_string(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Categories as String")
+        t.categories_set("foo")
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
     def test_tags_arg_tuple_set(self):
         c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
