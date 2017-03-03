@@ -81,6 +81,12 @@ def create_snippet_entry(file_name, mime_type, name):
 def has_invalid_character(string):
     return not bool(re.match("^[a-z0-9-:]*$", string))
 
+def to_list(args):
+    # depending how the user calls a function we want a identical
+    # behavior: func(a, b, c, d) and func([a, b, c, d])
+    if len(args) == 1 and type(args[0]) is list:
+        return list(args[0])
+    return list(args)
 
 class TestMimeTypes():
     types_map = dict()
@@ -179,6 +185,7 @@ class Test(object):
 
         def tags_set(self, *tags):
             self.tags = list()
+            tags = to_list(tags)
             for tag in tags:
                 if has_invalid_character(tag):
                     emsg = "tag contain invalid char which is not allowed ([a-z0-9-:]): {}"
@@ -188,6 +195,7 @@ class Test(object):
             self._tags_cleanup()
 
         def tags_add(self, *tags):
+            tags = to_list(tags)
             for tag in tags:
                 if has_invalid_character(tag):
                     emsg = "tag contain invalid char which is not allowed ([a-z0-9-:]): {}"
@@ -203,11 +211,13 @@ class Test(object):
 
         def references_set(self, *references):
             self.references = []
+            references = to_list(references)
             for reference in references:
                 self.references.append(reference)
             self._references_cleanup()
 
         def references_add(self, *references):
+            references = to_list(references)
             for reference in references:
                 self.references.append(reference)
             self._references_cleanup()
@@ -331,6 +341,7 @@ class Test(object):
 
     def categories_set(self, *categories):
         self.categories = list()
+        categories = to_list(categories)
         for category in categories:
             if has_invalid_character(category):
                 emsg = "category contains invalid char which is not allowed(): {}"
