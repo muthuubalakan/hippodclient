@@ -36,12 +36,21 @@ def file_py_path():
 
 def random_category():
     category_first = ["team:foo", "team:bar", "team:qux"]
-    category_second = ["os-core", "configuration", "routing", "init"]
+    category_second  = ["os-core", "configuration", "routing", "init", "networking"]
+    category_second += ["logging", "bootloader", "se-linux" ]
     category = []
     category.append(random.choice(category_first))
     for i in range(random.randint(1, 3)):
         category.append(random.choice(category_second))
     return category
+
+def random_tags():
+    tags  = ["performance", "security", "shell", "daemon", "compiler", "runtime"]
+    tags += ["kernel", "userspace", "realtime", "irq", "softirq", "thread"]
+    ret = []
+    for i in range(random.randint(1, 10)):
+        ret.append(random.choice(tags))
+    return ret
 
 def random_result():
     results = ["passed", "exception", "failed", "nonapplicable" ]
@@ -376,8 +385,88 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
+    def test_category_arg_tuple(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
 
-    def test_mass(self):
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Categories as Array")
+        t.categories_set(random_category())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+    def test_category_arg_list(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Categories as Argument List")
+        t.categories_set(*random_category())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+    def test_tags_arg_tuple_set(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Tags as Array via Set")
+        t.categories_set(*random_category())
+        t.attachment.tags_set(random_tags())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+    def test_tags_arg_list_set(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Tags as Argument List via Set")
+        t.categories_set(*random_category())
+        t.attachment.tags_set(*random_tags())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+    def test_tags_arg_tuple_add(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Tags as Array via Add")
+        t.categories_set(*random_category())
+        t.attachment.tags_add(random_tags())
+        t.attachment.tags_add(random_tags())
+        t.attachment.tags_add(random_tags())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+    def test_tags_arg_list_add(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Test with Tags as Argument List via Add")
+        t.categories_set(*random_category())
+        t.attachment.tags_add(*random_tags())
+        t.attachment.tags_add(*random_tags())
+        t.attachment.tags_add(*random_tags())
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
+
+    def mass(self):
         for i in range(5000):
             c = hippodclient.Container(url=URL, timeout=TIMEOUT)
             title = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(1))
