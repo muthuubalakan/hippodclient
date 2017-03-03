@@ -198,7 +198,7 @@ class TestHippodClient(TestCase):
         t.achievement.result = "nonapplicable"
 
         tmps = []
-        for i in range(10):
+        for i in range(4):
             tmp_dir, graph_path = gen_snippet_file(i)
             t.snippet_file_add(graph_path, "x-snippet-python3-matplot-png")
             tmps.append(tmp_dir)
@@ -236,7 +236,7 @@ class TestHippodClient(TestCase):
         t.achievement.result = "nonapplicable"
 
         tmps = []
-        for i in range(10):
+        for i in range(4):
             tmp_dir, graph_path = gen_snippet_file(i)
             t.achievement.snippet_file_add(graph_path, "x-snippet-python3-matplot-png")
             tmps.append(tmp_dir)
