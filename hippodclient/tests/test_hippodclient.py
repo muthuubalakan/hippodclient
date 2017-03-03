@@ -465,6 +465,19 @@ class TestHippodClient(TestCase):
         c.add(t)
         c.upload()
 
+    def test_responsible(self):
+        c = hippodclient.Container(url=URL, timeout=TIMEOUT)
+
+        t = hippodclient.Test()
+        t.submitter_set("anonymous")
+        t.title_set("Responsible Set Test")
+        t.categories_set(*random_category())
+        t.attachment.responsible_set("anonymous")
+        t.achievement.result = random_result()
+
+        c.add(t)
+        c.upload()
+
 
     def mass(self):
         for i in range(5000):
