@@ -253,7 +253,7 @@ class Test(object):
             if date is None:
                 date = datetime.datetime.now().isoformat('T')
             self.result = result
-            self.test_data = date
+            self.test_date = date
 
         def anchor_set(self, anchor):
             if type(anchor) is not str:
