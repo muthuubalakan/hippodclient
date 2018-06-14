@@ -10,13 +10,9 @@ import datetime
 import mimetypes
 import getpass
 import textwrap
+import asyncio
+import aiohttp
 
-try:
-    # python3
-    import urllib.request as urllib_request
-except ImportError:
-    # python2
-    import urllib2 as urllib_request
 
 REQUEST_TIMEOUT = 5
 
@@ -116,6 +112,7 @@ class Container(object):
         self._init_defaults()
         self.timeout = timeout
         self.url = url
+        self.loop = asyncio.get_event_loop()
 
     def _init_defaults(self):
         self.tests = list()
@@ -130,7 +127,7 @@ class Container(object):
         if not self.url:
             raise ConfigurationException("no hippod server URL specified")
 
-    def _send_data(self, data):
+    async def _send_data(self, data):
         self.user_agent_headers = {'Content-type': 'application/json',
                                    'Accept': 'application/json',
                                    'User-Agent' : 'Hippodclient/1.0+'
@@ -139,36 +136,20 @@ class Container(object):
         if self.url.endswith("/"): seperator = ""
         full_url = "{}{}{}".format(self.url, seperator, "api/v1/object")
         data = str.encode(data)
-        req = urllib_request.Request(full_url, data, self.user_agent_headers)
-        try:
-            urllib_request.urlopen(req, timeout=self.timeout)
-        except urllib_request.HTTPError as e:
-            sys.stderr.write(str(e.read()))
-            return (False, e.read())
+        async with aiohttp.ClientSession() as session:
+            async with session.post(full_url, data=data) as resp:
+                print("Response: {}".format(resp.status))
         return (True, None)
 
-    def _disable_proxy(self):
-        # install no proxy, for proxied environments the
-        # system proxy is ignore here, for localhost communication
-        # this is fine, if you want to communicate via a proxy please
-        # remove the following lines
-        proxy_support = urllib_request.ProxyHandler({})
-        opener = urllib_request.build_opener(proxy_support)
-        urllib_request.install_opener(opener)
-
     def sync(self):
-        self._disable_proxy()
         self._check_pre_sync()
         ret_list = list()
         for test in self.tests:
             json_data = test.json()
-            ret = self._send_data(json_data)
+            ret = self.loop.run_until_complete(self._send_data(json_data))
             ret_list.append(ret)
         return ret_list
-
     # just an alias for sync
-    upload = sync
-
 
 
 class Test(object):
@@ -243,6 +224,7 @@ class Test(object):
         def __init__(self):
             self.result = DEFAULT_RESULT
             self.test_date = datetime.datetime.now().isoformat('T')
+            print("The date is ", self.test_date)
             self.data = list()
             self.anchor = None
 
