@@ -8,7 +8,7 @@ pip3 install hippodclient
 
 And simple upload test with the following lines:
 
-```
+```python
 import hippodclient
 
 c = hippodclient.Container(url="http://localhost")
@@ -36,13 +36,13 @@ install the required dependencies:
 
 For Debian and Python2 Environment
 
-```
+```bash
 sudo apt-get install python-setuptools
 ```
 
 For Debian and Python3 Environment
 
-```
+```bash
 sudo apt-get install python3-setuptools
 ```
 
@@ -58,12 +58,12 @@ sudo aptitude install python-tk
 
 Python2 Environment
 
-```
+```python
 python2 setup.py test
 ```
 
 Python3 Environment
 
-```
+```python
 python3 setup.py test
 ```
